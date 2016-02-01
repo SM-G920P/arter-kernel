@@ -780,6 +780,12 @@ on fs
     chown system system /dev/i2c-7
     chmod 0660 /dev/i2c-7
 
+# DIAG
+service DIAG-daemon /system/bin/diagexe
+    class main
+    user root
+    group system radio inet net_raw
+
 # ARGOSD
 service argos-daemon /system/bin/argosd
     class main
@@ -928,6 +934,20 @@ service TvoutService_C /system/bin/bintvoutservice
     group graphics
 on property:ro.SecEDS.enable=false
     stop TvoutService_C
+
+# Secure Storage startup
+service secure_storage /system/bin/secure_storage_daemon
+    class core
+    user system
+    group system
+    disabled
+
+on property:ro.securestorage.support=true
+    mkdir /dev/.secure_storage
+    chmod 0711 /dev/.secure_storage
+    chown system system /dev/.secure_storage
+    #restorecon -R /dev/.secure_storage
+    start secure_storage
 
 # umount service
 service umount_service /system/bin/umount /preload
